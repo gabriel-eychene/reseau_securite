@@ -39,13 +39,15 @@ void toLowerCase(char * texte)
 	texte[j] = '\0';
 }
 
-void encrypt(char * texte, char * clef)
+void decipher(char * texte, char * clef)
 {
 	int i = 0;
 	int j = 0;
+	char clefInverse;
 	while(texte[i] != '\0')
 	{
-		texte[i] = convertion(texte[i], clef[j]);
+		clefInverse = 26 - ( clef[j] - 96) + 96;
+		texte[i] = convertion(texte[i], clefInverse);
 		i++;
 		j++;
 		if(clef[j] == '\0')
@@ -59,15 +61,15 @@ int main(int argc, char *argv[])
 {
 	char texte[BUFFER_SIZE];
 	char clef[BUFFER_SIZE];
-	printf("Entrez le message a chiffrer : \n");
+	printf("Entrez le message a dechiffrer : \n");
 	fgets(texte, BUFFER_SIZE, stdin);
 	printf("Entrez la clef : \n");
 	fgets(clef, BUFFER_SIZE, stdin);
 	toLowerCase(texte);
 	toLowerCase(clef);
-	printf("texte : %s\nClef : %s\n", texte, clef );
-	encrypt(texte, clef);
-	printf("Message chiffre : %s\n", texte);
+	printf("Texte : %s\nClef : %s\n", texte, clef );
+	decipher(texte, clef);
+	printf("Message dechiffre : %s\n", texte);
 
 
 	return 0;
