@@ -2,7 +2,6 @@
 #define BUFFER_SIZE 128
 
 char convertion(char letterToConvert, char keyLetter){
-	printf("Lettre à convertir: %c\n", letterToConvert);
 	char alphabet[26] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'};
 	int keyNum, letterNum;
 	for(int i = 0; i <= 25; i++){
@@ -40,17 +39,36 @@ void toLowerCase(char * texte)
 	texte[j] = '\0';
 }
 
+void encrypt(char * texte, char * clef)
+{
+	int i = 0;
+	int j = 0;
+	while(texte[i] != '\0')
+	{
+		texte[i] = convertion(texte[i], clef[j]);
+		i++;
+		j++;
+		if(clef[j] == '\0')
+		{
+			j = 0;
+		}
+	}
+}
+
 int main(int argc, char *argv[])
 {
-  char texte[BUFFER_SIZE];
+	char texte[BUFFER_SIZE];
+	char clef[BUFFER_SIZE];
+	printf("Entrez le message a chiffrer : \n");
 	fgets(texte, BUFFER_SIZE, stdin);
+	printf("Entrez la clef : \n");
+	fgets(clef, BUFFER_SIZE, stdin);
 	toLowerCase(texte);
-	printf("%s\n", texte);
-  
-	char test, res, key = 'g';
-	scanf("%c\n", &test);
-	res = convertion(test, key);
-	printf("%c\n", res);
+	toLowerCase(clef);
+	printf("texte : %s\nClef : %s\n", texte, clef );
+	encrypt(texte, clef);
+	printf("Message chiffre : %s\n", texte);
+
 
 	return 0;
 }
