@@ -77,23 +77,72 @@ char * probableWord(char * texte, char * mot, int position)
 	return sousTexte;
 }
 
+void bazeries(char * texte, char * mot)
+{
+	int tailleMot = 0;
+	int tailleTexte = 0;
+	int position;
+	int i;
+	int j;
+	int estCle;
+	char * clePossible;
+	while(mot[tailleMot] != '\0')
+	{
+		tailleMot++;
+	}
+	while(texte[tailleTexte] != '\0')
+	{
+		tailleTexte++;
+	}
+	for( position = 0 ; position < tailleTexte - tailleMot ; position++ )
+	{
+		clePossible = probableWord(texte, mot, position);
+		i = 0;
+		estCle = 0;
+		while( !estCle && i < tailleMot -1 )
+		{
+			i++;
+			estCle = 1;
+			j = 0;
+			while( estCle && (i + j < tailleMot))
+			{
+				if(clePossible[j + i] == clePossible[j % i])
+				{
+					j++;
+				}
+				else
+				{
+					estCle = 0;
+				}
+			}
+		}
+		if(estCle)
+		{
+			printf("cle possible : ");
+			for(j = 0 ; j < i ; j++)
+			{
+				printf("%c", clePossible[( position + j ) % i ]);
+			}
+			printf("\n");
+		}
+		free(clePossible);
+	}
+
+
+}
+
 int main(int argc, char *argv[])
 {
 	char texte[BUFFER_SIZE];
 	char mot[BUFFER_SIZE];
-	int position;
 	printf("Entrez le message a dechiffrer : \n");
 	fgets(texte, BUFFER_SIZE, stdin);
 	printf("Entrez le mot probable : \n");
 	fgets(mot, BUFFER_SIZE, stdin);
-	printf("Entrez la position du mot probable : \n");
-	scanf("%d\n", &position);
 	toLowerCase(texte);
 	toLowerCase(mot);
 	printf("Texte : %s\nMot : %s\n", texte, mot );
-	char * motDechiffre = probableWord(texte, mot, position);
-	printf("Mot dechiffre : %s\n", motDechiffre);
-	free(motDechiffre);
+	bazeries(texte, mot);
 
 	return 0;
 }
