@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #define BUFFER_SIZE 128
 
 char convertion(char letterToConvert, char keyLetter){
@@ -57,20 +58,42 @@ void decipher(char * texte, char * clef)
 	}
 }
 
+char * probableWord(char * texte, char * mot, int position)
+{
+	int i = 0;
+	while( mot[i] != '\0')
+	{
+		i++;
+	}
+	char * sousTexte = (char *)malloc(( i + 1 ) * sizeof(char) );
+	i = 0;
+	while( mot[i] != '\0')
+	{
+		sousTexte[i] = texte[i + position];
+		i++;
+	}
+	sousTexte[i] = '\0';
+	decipher(sousTexte, mot);
+	return sousTexte;
+}
+
 int main(int argc, char *argv[])
 {
 	char texte[BUFFER_SIZE];
-	char clef[BUFFER_SIZE];
+	char mot[BUFFER_SIZE];
+	int position;
 	printf("Entrez le message a dechiffrer : \n");
 	fgets(texte, BUFFER_SIZE, stdin);
-	printf("Entrez la clef : \n");
-	fgets(clef, BUFFER_SIZE, stdin);
+	printf("Entrez le mot probable : \n");
+	fgets(mot, BUFFER_SIZE, stdin);
+	printf("Entrez la position du mot probable : \n");
+	scanf("%d\n", &position);
 	toLowerCase(texte);
-	toLowerCase(clef);
-	printf("Texte : %s\nClef : %s\n", texte, clef );
-	decipher(texte, clef);
-	printf("Message dechiffre : %s\n", texte);
-
+	toLowerCase(mot);
+	printf("Texte : %s\nMot : %s\n", texte, mot );
+	char * motDechiffre = probableWord(texte, mot, position);
+	printf("Mot dechiffre : %s\n", motDechiffre);
+	free(motDechiffre);
 
 	return 0;
 }
