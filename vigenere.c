@@ -101,7 +101,7 @@ void freqAnalyse( char * texte, int keySize )
 		}
 		printf("\nEntrez la lettre correspondant au e : ");
 		fgets(input, BUFFER_SIZE, stdin);
-		key[i] = ((input[0] - 'e') % 26 + 'a' - 1);
+		key[i] = ((input[0] - 'e' + 26 ) % 26 + 'a' - 1);
 
 	}
 
@@ -120,7 +120,7 @@ void freqAnalyse( char * texte, int keySize )
 }
 
 int main(int argc, char *argv[])
-{	
+{
 	char texte[BUFFER_SIZE];
 	fgets(texte, BUFFER_SIZE, stdin);
 	toLowerCase(texte);
