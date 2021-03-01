@@ -1,7 +1,7 @@
 CC=gcc
 SFLAGS=-Wall
-OBJETS=vigenere.o
-EXECUTABLE=vigenere
+OBJETS=Babbage.o
+EXECUTABLE=babbage
 
 
 all : $(EXECUTABLE)
@@ -9,7 +9,7 @@ all : $(EXECUTABLE)
 $(EXECUTABLE) : $(OBJETS)
 	$(CC) $(SFLAGS) -o $@ $(OBJETS)
 
-$(OBJETS) : vigenere.c
+$(OBJETS) : Babbage.c
 	$(CC) $(SFLAGS) -c $<
 
 clean :

@@ -27,27 +27,32 @@ void tabContain(int* tab){
 }
 
 void gap(int* tab, int nbElem){
-
 	//Tableau contenant les diviseurs communs entre les écarts
-	int** dividers;
-	dividers = malloc(nbElem * sizeof(int));
+	int** dividers = (int **)malloc(nbElem * sizeof(int*));
 	if(dividers == NULL){
 		exit(0);
 	}
-	printf("----\n");
-	dividers[5] = tab;
-	printf("tab[5] = %d\n", tab[5]);
-	printf("----\n");
+	// printf("----\n");
+	// dividers[5] = tab;
+	// printf("tab[5] = %d\n", tab[5]);
+	// printf("----\n");
+	
+	for( int i = 0 ; i < nbElem ; i++ )
+	{
+		dividers[i] = malloc((tab[i]+2)*sizeof(int));
+	}
 
 	//Pour chaque écart, on calcul ses diviseurs
 	for(int i=0; i<nbElem; i++){
+		printf("i = %d et tab[i] = %d\n", i, tab[i]);
 
-		printf("i = %d\n", i);
 
 		//Ajout de la valeur de l'écart ainsi que le nombre de diviseurs dans les premières colonnes de la ligne i
-		dividers[i] = malloc(2*sizeof(int));
+
+		printf("%d\n", dividers[0][0]);
 		dividers[i][0] = tab[i];
 		dividers[i][1] = 0;
+
 
 		//Ajout des diviseur de l'écart sur le reste des colonnes de la ligne i
 		for(int j=1; j<=tab[i]; j++){
@@ -170,7 +175,7 @@ void occurrence(char message[BUFFER_SIZE], int windowSizeStart){
 			windowSize = windowSizeStart;
 		}
 	}
-	//gap(ecartOccur, nbElem);
+	gap(ecartOccur, nbElem);
 
 	for(int i = 0; i<nbElem; i++){
 		printf("[%d]", ecartOccur[i]);
