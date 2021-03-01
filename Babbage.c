@@ -13,21 +13,10 @@ char** ajout(char** tab, char* mot, int nbTypeOccur){
 
 //Methode permettant de tester si le mot appartient au tablau des occurences déjà traitées
 int isContain(char** tab, char* mot, int size){
-	int res;
+	int res = 0;
 	for(int i=0; i<size; i++){
-		res = 1;
-		if(strlen(tab[i]) != strlen(mot)){
-			res = 0;
-		}
-		else{
-			for(int j=0; j<size; j++){
-				if(mot[j] != tab[i][j]){
-					res = 0;
-				}
-			}
-		}
-		if(res){
-			break;
+		if(strcmp(tab[i], mot) == 0){
+			res = 1;
 		}
 	}
 	return res;
@@ -94,7 +83,7 @@ void occurrence(char message[BUFFER_SIZE], int windowSizeStart){
 	//Allocation mémoire
 	//Tableau 2d contenant les différentes répétitions
 	char** typeOccur;
-	typeOccur = malloc(strlen(message) * sizeof(char));
+	typeOccur = malloc(strlen(message) * sizeof(char*));
 	if(typeOccur == NULL){
 		exit(0);
 	}
@@ -134,8 +123,8 @@ void occurrence(char message[BUFFER_SIZE], int windowSizeStart){
 			//Si pas de différence, on a une occurence suplémentaire
 			if(diff == 0){
 
-				//On sauvgarde l'espace entre les deux séquences
-				ecartOccur = realloc(ecartOccur, sizeof(int));
+				//On sauvegarde l'espace entre les deux séquences
+				ecartOccur = realloc(ecartOccur, sizeof(int));	
 				if(ecartOccur == NULL){
 					exit(0);
 				}
@@ -154,6 +143,7 @@ void occurrence(char message[BUFFER_SIZE], int windowSizeStart){
 			for(int l=0; l<windowSize; l++){
 				mot[l] = message[l + windowStart];
 			}
+			mot[windowSize] = '\0';
 
 			//On test si on a déjà comptabilisé ce type d'occurrence.
 			if(!isContain(typeOccur, mot, nbTypeOccur)){
