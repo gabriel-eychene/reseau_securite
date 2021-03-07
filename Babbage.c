@@ -4,9 +4,9 @@
 #define BUFFER_SIZE 128
 
 //Méthode permettant d'ajouter un mot au tableau contenant les différentes occurences
-char** ajout(char** tab, char* mot, int nbTypeOccur){
-	tab[nbTypeOccur] = malloc(strlen(mot)*sizeof(char));
-	for(int i=0; i<strlen(mot); i++){
+void ajout(char** tab, char* mot, int nbTypeOccur){
+	tab[nbTypeOccur] = malloc((strlen(mot)+1)*sizeof(char));
+	for(int i=0; i<strlen(mot)+1; i++){
 		tab[nbTypeOccur][i] = mot[i];
 	}
 }
@@ -22,22 +22,18 @@ int isContain(char** tab, char* mot, int size){
 	return res;
 }
 
-void tabContain(int* tab){
-
-}
-
 void gap(int* tab, int nbElem){
 
 	//Tableau contenant les diviseurs communs entre les écarts
 	int** dividers;
-	dividers = malloc(nbElem * sizeof(int));
+	dividers = malloc(nbElem * sizeof(int*));
 	if(dividers == NULL){
 		exit(0);
 	}
-	printf("----\n");
-	dividers[5] = tab;
-	printf("tab[5] = %d\n", tab[5]);
-	printf("----\n");
+
+	for(int i=0; i<nbElem; i++){
+		dividers[i] = malloc((tab[i]+2) * sizeof(int));
+	}
 
 	//Pour chaque écart, on calcul ses diviseurs
 	for(int i=0; i<nbElem; i++){
@@ -45,16 +41,34 @@ void gap(int* tab, int nbElem){
 		printf("i = %d\n", i);
 
 		//Ajout de la valeur de l'écart ainsi que le nombre de diviseurs dans les premières colonnes de la ligne i
-		dividers[i] = malloc(2*sizeof(int));
+		//dividers[i] = malloc((tab[i]+2) * sizeof(int));
 		dividers[i][0] = tab[i];
 		dividers[i][1] = 0;
 
 		//Ajout des diviseur de l'écart sur le reste des colonnes de la ligne i
 		for(int j=1; j<=tab[i]; j++){
 			if(tab[i]%j == 0){
-				//dividers[i] = realloc(dividers[i], sizeof(int));
+				//dividers[i] = realloc(dividers[i],sizeof(int));
 				dividers[i][dividers[i][1]+2] = j;
 				dividers[i][1]++;
+			}
+		}
+	}
+
+	int tmp = 0;
+	for(int i=0; i<nbElem; i++){
+		for(int j=0; j<nbElem; j++){
+			for(int k=2; k<dividers[i][1]+2; k++){
+				for(int l=2; l<dividers[j][1]+2; l++){
+					if(dividers[i][k] == dividers[j][l]){
+						tmp = 1;
+						break;
+					}
+				}
+				if(!tmp){
+					dividers[i][k] = 0;
+				}
+				tmp = 0;
 			}
 		}
 	}
@@ -90,14 +104,14 @@ void occurrence(char message[BUFFER_SIZE], int windowSizeStart){
 
 	//Variable réprésentant le mot de la fenêtre
 	char* mot;
-	mot = malloc(windowSize * sizeof(char));
+	mot = malloc((windowSize+1) * sizeof(char));
 	if(mot == NULL){
 		exit(0);
 	}
 
 	//Tableau contenant les différents écarts entre les répétitions
 	int* ecartOccur;
-	ecartOccur = malloc(sizeof(int));
+	ecartOccur = malloc((strlen(message)+1) * sizeof(int));
 	if(ecartOccur == NULL){
 		exit(0);
 	}
@@ -123,11 +137,6 @@ void occurrence(char message[BUFFER_SIZE], int windowSizeStart){
 			//Si pas de différence, on a une occurence suplémentaire
 			if(diff == 0){
 
-				//On sauvegarde l'espace entre les deux séquences
-				ecartOccur = realloc(ecartOccur, sizeof(int));	
-				if(ecartOccur == NULL){
-					exit(0);
-				}
 				ecartOccur[nbElem] = i - windowStart;
 				nbElem++;
 
@@ -170,12 +179,12 @@ void occurrence(char message[BUFFER_SIZE], int windowSizeStart){
 			windowSize = windowSizeStart;
 		}
 	}
-	//gap(ecartOccur, nbElem);
+	gap(ecartOccur, nbElem);
 
-	for(int i = 0; i<nbElem; i++){
+	/*for(int i = 0; i<nbElem; i++){
 		printf("[%d]", ecartOccur[i]);
 	}
-	printf("\n");
+	printf("\n");*/
 
 	//Libération de mémoire
 	for(int i=0; i<nbTypeOccur; i++){
@@ -194,8 +203,15 @@ int main(int argc, char *argv[])
 	occurrence(texte, 3);*/
 
 	//Exemple du TP:
-	occurrence("abcdefghijklmnopqrstuvwxyzabcdmnoabc",3);
+	//occurrence("abcdefghijklmnopqrstuvwxyzabcdmnoabc",3);
+	occurrence("ksemcptnplfhkzuggtakeoagfldxhvixsbiogudtkadnhvixfhnlnhvbnsewgmobzllegzewkamthvivgztecwrxopekgmobulteckekppekgmobuxuxllvxpkswwmobgkagusaokslxflfhke",3);
 	return 0;
+
+	//ksemcptnplfhkzuggtakeoagfldxhvixsbiogudtkadnhvixfhnlnhvbnsewgmobzllegzewkamthvivgztecwrxopekgmobulteckekppekgmobuxuxllvxpkswwmobgkagusaokslxflfhke
+	//veiaftmlvagxqmrqiemrqrbqoegiesfvxlidrfqmieahnnunae
+
+	//Texte criffré avec la clef "clef":
+	//oqhnlrkxhpjblsjtuqjywgsybeyshpjikukluqrkqfuguezhvfnzxfnuqbtrbmqvkmgzlczkpmnyxzjspqqkwfwkggrkvefmh
 }
 
 
