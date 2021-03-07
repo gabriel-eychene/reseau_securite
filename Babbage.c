@@ -23,8 +23,8 @@ int isContain(char** tab, char* mot, int size){
 }
 
 void gap(int* tab, int nbElem){
-
 	//Tableau contenant les diviseurs communs entre les écarts
+
 	int** dividers;
 	dividers = malloc(nbElem * sizeof(int*));
 	if(dividers == NULL){
@@ -37,13 +37,15 @@ void gap(int* tab, int nbElem){
 
 	//Pour chaque écart, on calcul ses diviseurs
 	for(int i=0; i<nbElem; i++){
+		printf("i = %d et tab[i] = %d\n", i, tab[i]);
 
-		printf("i = %d\n", i);
 
 		//Ajout de la valeur de l'écart ainsi que le nombre de diviseurs dans les premières colonnes de la ligne i
 		//dividers[i] = malloc((tab[i]+2) * sizeof(int));
+
 		dividers[i][0] = tab[i];
 		dividers[i][1] = 0;
+
 
 		//Ajout des diviseur de l'écart sur le reste des colonnes de la ligne i
 		for(int j=1; j<=tab[i]; j++){
