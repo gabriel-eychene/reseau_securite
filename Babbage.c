@@ -2,12 +2,20 @@
 #include <string.h>
 #include <stdlib.h>
 #define BUFFER_SIZE 128
+#define LIMIT_PERCENTAGE 2
 
 //Méthode permettant d'ajouter un mot au tableau contenant les différentes occurences
 void ajout(char** tab, char* mot, int nbTypeOccur){
 	tab[nbTypeOccur] = malloc((strlen(mot)+1)*sizeof(char));
 	for(int i=0; i<strlen(mot)+1; i++){
 		tab[nbTypeOccur][i] = mot[i];
+	}
+}
+
+void ajoutEcart(int** ecartOccur, int* ecartTmp, int nbElem, int nbTypeOccur){
+	ecartOccur[nbTypeOccur] = malloc((nbElem)*sizeof(int));
+	for(int i=0; i<nbElem; i++){
+		ecartOccur[nbTypeOccur][i] = ecartTmp[i];
 	}
 }
 
@@ -23,8 +31,9 @@ int isContain(char** tab, char* mot, int size){
 }
 
 void gap(int* tab, int nbElem){
-	//Tableau contenant les diviseurs communs entre les écarts
+	int key = 0;
 
+	//Tableau contenant les diviseurs communs entre les écarts
 	int** dividers;
 	dividers = malloc(nbElem * sizeof(int*));
 	if(dividers == NULL){
@@ -78,15 +87,36 @@ void gap(int* tab, int nbElem){
 	for(int i=0; i<nbElem; i++){
 		printf("Ecart[%d]: ", dividers[i][0]);
 		for(int j=0; j<dividers[i][1]; j++){
+			if(key < dividers[i][j+2]){
+				key = dividers[i][j+2];
+			}
 			printf("[%d]", dividers[i][j+2]);
 		}
 		printf("\n");
 	}
+	printf("La clé semble être de taille %d.\n", key);	
 
 	for(int i=0; i<nbElem; i++){
 		free(dividers[i]);
 	}
 	free(dividers);
+}
+
+void cleanOccur(char** tabtTypeOccur, int** ecartOccu, int* tabNbOccur, int nbTypeOccur){
+
+	//Calcul de la somme total du nombre d'occurrences
+	int sumNbOccur = 0;	
+	for(int i=0; i<nbTypeOccur; i++){
+		sumNbOccur += tabNbOccur[i];
+	}
+	
+	for(int j=0; j<nbTypeOccur; j++){
+		if((tabNbOccur[j]*100)/sumNbOccur < 3.5/*LIMIT_PERCENTAGE*/){
+			for(int k=0; k<tabNbOccur[j]-1; k++){
+				ecartOccu[j][k] = 0;
+			}
+		}
+	}
 }
 
 void occurrence(char message[BUFFER_SIZE], int windowSizeStart){
@@ -95,12 +125,20 @@ void occurrence(char message[BUFFER_SIZE], int windowSizeStart){
 	int nbOccur = 0;
 	int diff;
 	int nbTypeOccur = 0;
+	int cpt = 0;
 
 	//Allocation mémoire
 	//Tableau 2d contenant les différentes répétitions
 	char** typeOccur;
 	typeOccur = malloc(strlen(message) * sizeof(char*));
 	if(typeOccur == NULL){
+		exit(0);
+	}
+
+	//Variable réprésentant le nombre de répétition de chaque mot (dans l'odre des mots présents dans typeOccur)
+	int* nbOccurence;
+	nbOccurence = malloc(strlen(message) * sizeof(int));
+	if(nbOccurence == NULL){
 		exit(0);
 	}
 
@@ -111,16 +149,22 @@ void occurrence(char message[BUFFER_SIZE], int windowSizeStart){
 		exit(0);
 	}
 
+	//Tableau temporaire contenant les différents écarts entre les répétitions d'une occurence
+	int* ecartTmp;
+	ecartTmp = malloc((strlen(message)+1) * sizeof(int));
+	if(ecartTmp == NULL){
+		exit(0);
+	}
 	//Tableau contenant les différents écarts entre les répétitions
-	int* ecartOccur;
-	ecartOccur = malloc((strlen(message)+1) * sizeof(int));
+	int** ecartOccur;
+	ecartOccur = malloc((strlen(message)+1) * sizeof(int*));
 	if(ecartOccur == NULL){
 		exit(0);
 	}
 	int nbElem = 0;
 
 	while((windowStart + windowSize) < strlen(message)){
-
+		
 		//Nombre de répétition initialisé à 1
 		nbOccur = 1;
 
@@ -139,8 +183,10 @@ void occurrence(char message[BUFFER_SIZE], int windowSizeStart){
 			//Si pas de différence, on a une occurence suplémentaire
 			if(diff == 0){
 
-				ecartOccur[nbElem] = i - windowStart;
+				//Ajout de l'écart entre les deux occurences dans le tableau des de l'écart d'une Occurence
+				ecartTmp[nbElem] = i - windowStart;
 				nbElem++;
+
 
 				//Incrémentation du nombre d'occurence
 				nbOccur++;
@@ -158,15 +204,21 @@ void occurrence(char message[BUFFER_SIZE], int windowSizeStart){
 
 			//On test si on a déjà comptabilisé ce type d'occurrence.
 			if(!isContain(typeOccur, mot, nbTypeOccur)){
-
+				
+				//Ajout du mot au type d'occurence
 				ajout(typeOccur, mot, nbTypeOccur);
+				nbOccurence[nbTypeOccur] = nbOccur;
+
+				ajoutEcart(ecartOccur, ecartTmp, nbElem, nbTypeOccur);
+
 				nbTypeOccur++;
 
+				//Affichage
 				for(int k=0; k<windowSize; k++){
 					printf("%c", message[k + windowStart]);
 				}
-
 				printf(" trouvé %d fois.\n", nbOccur);
+				
 			}
 			windowSize++;
 
@@ -174,6 +226,13 @@ void occurrence(char message[BUFFER_SIZE], int windowSizeStart){
 			for(int m=0; m<windowSize; m++){
 				mot[m] = '\0';
 			}
+			
+			//Remise à 0 de la varialbe "ecartTmp"
+			for(int n=0; n<nbElem; n++){
+				ecartTmp[n] = 0;
+			}
+			nbElem = 0;
+			
 		}
 		//Sinon on remet la taille de la fenêtre à celle de base, et on déplace le début de celle-ci
 		else{
@@ -181,12 +240,21 @@ void occurrence(char message[BUFFER_SIZE], int windowSizeStart){
 			windowSize = windowSizeStart;
 		}
 	}
-	gap(ecartOccur, nbElem);
 
-	/*for(int i = 0; i<nbElem; i++){
-		printf("[%d]", ecartOccur[i]);
+	cleanOccur(typeOccur, ecartOccur, nbOccurence, nbTypeOccur);
+
+	//Transformation du tableau 2d en tableau 1d
+	for(int i=0; i<nbTypeOccur; i++){
+		for(int j=0; j<nbOccurence[i]; j++){
+			if(ecartOccur[i][j] != 0){
+				ecartTmp[cpt] = ecartOccur[i][j];
+				cpt++;
+			}	
+		}
 	}
-	printf("\n");*/
+
+	//Fonction permettant de determiner les diviseurs communs entre les écarts et ainsi estimer la taille de la clé
+	gap(ecartTmp, cpt);
 
 	//Libération de mémoire
 	for(int i=0; i<nbTypeOccur; i++){
@@ -194,7 +262,11 @@ void occurrence(char message[BUFFER_SIZE], int windowSizeStart){
 	}
 	free(typeOccur);
 	free(mot);
+	for(int j=0; j<nbTypeOccur; j++){
+		free(ecartOccur[j]);
+	}
 	free(ecartOccur);
+	free(ecartTmp);
 }
 
 int main(int argc, char *argv[])
