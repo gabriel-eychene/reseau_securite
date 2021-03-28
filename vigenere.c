@@ -122,12 +122,14 @@ void freqAnalyse( char * texte, int keySize )
 int main(int argc, char *argv[])
 {
 	char texte[BUFFER_SIZE];
+	printf("Entrez le message a casser : \n");
 	fgets(texte, BUFFER_SIZE, stdin);
 	toLowerCase(texte);
 	printf("%s\n", texte);
 
 	char keySizeInput[BUFFER_SIZE];
 	int keySize;
+	printf("Entrez la taille de la clef : \n");
 	fgets(keySizeInput, BUFFER_SIZE, stdin);
 	keySize = atoi(keySizeInput);
 	freqAnalyse(texte, keySize);
